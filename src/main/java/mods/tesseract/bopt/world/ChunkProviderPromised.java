@@ -14,55 +14,52 @@ import net.minecraft.block.BlockSand;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.IProgressUpdate;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.gen.NoiseGenerator;
 import net.minecraft.world.gen.NoiseGeneratorOctaves;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.terraingen.ChunkProviderEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
+import net.minecraftforge.event.terraingen.TerrainGen;
 
 public class ChunkProviderPromised implements IChunkProvider {
     private Random endRNG;
-
-    private NoiseGeneratorOctaves field_912_k;
-
-    private NoiseGeneratorOctaves field_911_l;
-
-    private NoiseGeneratorOctaves field_910_m;
-
-    public NoiseGeneratorOctaves field_922_a;
-
-    public NoiseGeneratorOctaves field_921_b;
-
+    private NoiseGeneratorOctaves noiseGen1;
+    private NoiseGeneratorOctaves noiseGen2;
+    private NoiseGeneratorOctaves noiseGen3;
+    public NoiseGeneratorOctaves noiseGen4;
+    public NoiseGeneratorOctaves noiseGen5;
     private World endWorld;
-
     private double[] densities;
-
+    /** The biomes that are used to generate the chunk */
     private BiomeGenBase[] biomesForGeneration;
+    double[] noiseData1;
+    double[] noiseData2;
+    double[] noiseData3;
+    double[] noiseData4;
+    double[] noiseData5;
 
-    double[] field_4185_d;
+    public ChunkProviderPromised(World world, long seed) {
+        this.endWorld = world;
+        this.endRNG = new Random(seed);
+        this.noiseGen1 = new NoiseGeneratorOctaves(this.endRNG, 16);
+        this.noiseGen2 = new NoiseGeneratorOctaves(this.endRNG, 16);
+        this.noiseGen3 = new NoiseGeneratorOctaves(this.endRNG, 8);
+        this.noiseGen4 = new NoiseGeneratorOctaves(this.endRNG, 10);
+        this.noiseGen5 = new NoiseGeneratorOctaves(this.endRNG, 16);
 
-    double[] field_4184_e;
-
-    double[] field_4183_f;
-
-    double[] field_4182_g;
-
-    double[] field_4181_h;
-
-    int[][] field_73203_h = new int[32][32];
-
-    public ChunkProviderPromised(World par1World, long par2) {
-        this.endWorld = par1World;
-        this.endRNG = new Random(par2);
-        this.field_912_k = new NoiseGeneratorOctaves(this.endRNG, 16);
-        this.field_911_l = new NoiseGeneratorOctaves(this.endRNG, 16);
-        this.field_910_m = new NoiseGeneratorOctaves(this.endRNG, 8);
-        this.field_922_a = new NoiseGeneratorOctaves(this.endRNG, 10);
-        this.field_921_b = new NoiseGeneratorOctaves(this.endRNG, 16);
+        NoiseGenerator[] noiseGens = {noiseGen1, noiseGen2, noiseGen3, noiseGen4, noiseGen5};
+        noiseGens = TerrainGen.getModdedNoiseGenerators(world, this.endRNG, noiseGens);
+        this.noiseGen1 = (NoiseGeneratorOctaves)noiseGens[0];
+        this.noiseGen2 = (NoiseGeneratorOctaves)noiseGens[1];
+        this.noiseGen3 = (NoiseGeneratorOctaves)noiseGens[2];
+        this.noiseGen4 = (NoiseGeneratorOctaves)noiseGens[3];
+        this.noiseGen5 = (NoiseGeneratorOctaves)noiseGens[4];
     }
 
     public void generateTerrain(int par1, int par2, Block[] par3, BiomeGenBase[] par4ArrayOfBiomeGenBase) {
@@ -180,77 +177,140 @@ public class ChunkProviderPromised implements IChunkProvider {
     }
 
     private double[] initializeNoiseField(double[] ad, int i, int j, int k, int l, int i1, int j1) {
+        ChunkProviderEvent.InitNoiseField event = new ChunkProviderEvent.InitNoiseField(this, ad, i, j, k, l, i1, j1);
+        MinecraftForge.EVENT_BUS.post(event);
+        if (event.getResult() == Event.Result.DENY) return event.noisefield;
+
         if (ad == null)
+        {
             ad = new double[l * i1 * j1];
-        double d = 684.412D;
+        }
+
+        double d0 = 684.412D;
         double d1 = 684.412D;
-        this.field_4182_g = this.field_922_a.generateNoiseOctaves(this.field_4182_g, i, k, l, j1, 1.121D, 1.121D, 0.5D);
-        this.field_4181_h = this.field_921_b.generateNoiseOctaves(this.field_4181_h, i, k, l, j1, 200.0D, 200.0D, 0.5D);
-        d *= 2.0D;
-        this.field_4185_d = this.field_910_m.generateNoiseOctaves(this.field_4185_d, i, j, k, l, i1, j1, d / 80.0D, d1 / 160.0D, d / 80.0D);
-        this.field_4184_e = this.field_912_k.generateNoiseOctaves(this.field_4184_e, i, j, k, l, i1, j1, d, d1, d);
-        this.field_4183_f = this.field_911_l.generateNoiseOctaves(this.field_4183_f, i, j, k, l, i1, j1, d, d1, d);
+        this.noiseData4 = this.noiseGen4.generateNoiseOctaves(this.noiseData4, i, k, l, j1, 1.121D, 1.121D, 0.5D);
+        this.noiseData5 = this.noiseGen5.generateNoiseOctaves(this.noiseData5, i, k, l, j1, 200.0D, 200.0D, 0.5D);
+        d0 *= 2.0D;
+        this.noiseData1 = this.noiseGen3.generateNoiseOctaves(this.noiseData1, i, j, k, l, i1, j1, d0 / 80.0D, d1 / 160.0D, d0 / 80.0D);
+        this.noiseData2 = this.noiseGen1.generateNoiseOctaves(this.noiseData2, i, j, k, l, i1, j1, d0, d1, d0);
+        this.noiseData3 = this.noiseGen2.generateNoiseOctaves(this.noiseData3, i, j, k, l, i1, j1, d0, d1, d0);
         int k1 = 0;
         int l1 = 0;
-        int i2 = 16 / l;
-        for (int j2 = 0; j2 < l; j2++) {
-            int k2 = j2 * i2 + i2 / 2;
-            for (int l2 = 0; l2 < j1; l2++) {
-                int i3 = l2 * i2 + i2 / 2;
-                double d3 = 0.5D;
-                double d4 = 1.0D - d3;
-                d4 *= d4;
-                d4 *= d4;
-                d4 = 1.0D - d4;
-                double d5 = (this.field_4182_g[l1] + 256.0D) / 512.0D;
-                d5 *= d4;
-                if (d5 > 1.0D)
-                    d5 = 1.0D;
-                double d6 = this.field_4181_h[l1] / 8000.0D;
-                if (d6 < 0.0D)
-                    d6 = -d6 * 0.3D;
-                d6 = d6 * 3.0D - 2.0D;
-                if (d6 > 1.0D)
-                    d6 = 1.0D;
-                d6 /= 8.0D;
-                d6 = 0.0D;
-                if (d5 < 0.0D)
-                    d5 = 0.0D;
-                d5 += 0.5D;
-                d6 = d6 * i1 / 16.0D;
-                l1++;
-                double d7 = i1 / 2.0D;
-                for (int j3 = 0; j3 < i1; j3++) {
-                    double d8 = 0.0D;
-                    double d9 = (j3 - d7) * 8.0D / d5;
+
+        for (int i2 = 0; i2 < l; ++i2)
+        {
+            for (int j2 = 0; j2 < j1; ++j2)
+            {
+                double d2 = (this.noiseData4[l1] + 256.0D) / 512.0D;
+
+                if (d2 > 1.0D)
+                {
+                    d2 = 1.0D;
+                }
+
+                double d3 = this.noiseData5[l1] / 8000.0D;
+
+                if (d3 < 0.0D)
+                {
+                    d3 = -d3 * 0.3D;
+                }
+
+                d3 = d3 * 3.0D - 2.0D;
+                float f = (float)(i2 + i - 0) / 1.0F;
+                float f1 = (float)(j2 + k - 0) / 1.0F;
+                float f2 = 100.0F - MathHelper.sqrt_float(f * f + f1 * f1) * 8.0F;
+
+                if (f2 > 80.0F)
+                {
+                    f2 = 80.0F;
+                }
+
+                if (f2 < -100.0F)
+                {
+                    f2 = -100.0F;
+                }
+
+                if (d3 > 1.0D)
+                {
+                    d3 = 1.0D;
+                }
+
+                d3 /= 8.0D;
+                d3 = 0.0D;
+
+                if (d2 < 0.0D)
+                {
+                    d2 = 0.0D;
+                }
+
+                d2 += 0.5D;
+                d3 = d3 * (double)i1 / 16.0D;
+                ++l1;
+                double d4 = (double)i1 / 2.0D;
+
+                for (int k2 = 0; k2 < i1; ++k2)
+                {
+                    double d5 = 0.0D;
+                    double d6 = ((double)k2 - d4) * 8.0D / d2;
+
+                    if (d6 < 0.0D)
+                    {
+                        d6 *= -1.0D;
+                    }
+
+                    double d7 = this.noiseData2[k1] / 512.0D;
+                    double d8 = this.noiseData3[k1] / 512.0D;
+                    double d9 = (this.noiseData1[k1] / 10.0D + 1.0D) / 2.0D;
+
                     if (d9 < 0.0D)
-                        d9 *= -1.0D;
-                    double d10 = this.field_4184_e[k1] / 512.0D;
-                    double d11 = this.field_4183_f[k1] / 512.0D;
-                    double d12 = (this.field_4185_d[k1] / 10.0D + 1.0D) / 2.0D;
-                    if (d12 < 0.0D) {
-                        d8 = d10;
-                    } else if (d12 > 1.0D) {
-                        d8 = d11;
-                    } else {
-                        d8 = d10 + (d11 - d10) * d12;
+                    {
+                        d5 = d7;
                     }
-                    d8 -= 8.0D;
-                    int k3 = 32;
-                    if (j3 > i1 - k3) {
-                        double d13 = ((j3 - i1 - k3) / (k3 - 1.0F));
-                        d8 = d8 * (1.0D - d13) + -30.0D * d13;
+                    else if (d9 > 1.0D)
+                    {
+                        d5 = d8;
                     }
-                    k3 = 8;
-                    if (j3 < k3) {
-                        double d14 = ((k3 - j3) / (k3 - 1.0F));
-                        d8 = d8 * (1.0D - d14) + -30.0D * d14;
+                    else
+                    {
+                        d5 = d7 + (d8 - d7) * d9;
                     }
-                    ad[k1] = d8;
-                    k1++;
+
+                    d5 -= 8.0D;
+                    d5 += (double)f2;
+                    byte b0 = 2;
+                    double d10;
+
+                    if (k2 > i1 / 2 - b0)
+                    {
+                        d10 = (double)((float)(k2 - (i1 / 2 - b0)) / 64.0F);
+
+                        if (d10 < 0.0D)
+                        {
+                            d10 = 0.0D;
+                        }
+
+                        if (d10 > 1.0D)
+                        {
+                            d10 = 1.0D;
+                        }
+
+                        d5 = d5 * (1.0D - d10) + -3000.0D * d10;
+                    }
+
+                    b0 = 8;
+
+                    if (k2 < b0)
+                    {
+                        d10 = (double)((float)(b0 - k2) / ((float)b0 - 1.0F));
+                        d5 = d5 * (1.0D - d10) + -30.0D * d10;
+                    }
+
+                    ad[k1] = d5;
+                    ++k1;
                 }
             }
         }
+
         return ad;
     }
 
@@ -284,11 +344,6 @@ public class ChunkProviderPromised implements IChunkProvider {
     public boolean unloadQueuedChunks() {
         return false;
     }
-
-    public boolean unload100OldestChunks() {
-        return false;
-    }
-
     public boolean canSave() {
         return true;
     }
