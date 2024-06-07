@@ -1,15 +1,9 @@
 package mods.tesseract.bopt.world;
 
-import java.util.List;
-import java.util.Random;
-
 import biomesoplenty.api.content.BOPCBlocks;
-import biomesoplenty.common.blocks.BOPBlock;
-import biomesoplenty.common.core.BOPBlocks;
 import cpw.mods.fml.common.eventhandler.Event;
 import mods.tesseract.bopt.BOPTBlocks;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockSand;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Blocks;
@@ -27,6 +21,9 @@ import net.minecraftforge.event.terraingen.ChunkProviderEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.TerrainGen;
 
+import java.util.List;
+import java.util.Random;
+
 public class ChunkProviderPromised implements IChunkProvider {
     private Random endRNG;
     private NoiseGeneratorOctaves noiseGen1;
@@ -36,7 +33,9 @@ public class ChunkProviderPromised implements IChunkProvider {
     public NoiseGeneratorOctaves noiseGen5;
     private World endWorld;
     private double[] densities;
-    /** The biomes that are used to generate the chunk */
+    /**
+     * The biomes that are used to generate the chunk
+     */
     private BiomeGenBase[] biomesForGeneration;
     double[] noiseData1;
     double[] noiseData2;
@@ -55,58 +54,67 @@ public class ChunkProviderPromised implements IChunkProvider {
 
         NoiseGenerator[] noiseGens = {noiseGen1, noiseGen2, noiseGen3, noiseGen4, noiseGen5};
         noiseGens = TerrainGen.getModdedNoiseGenerators(world, this.endRNG, noiseGens);
-        this.noiseGen1 = (NoiseGeneratorOctaves)noiseGens[0];
-        this.noiseGen2 = (NoiseGeneratorOctaves)noiseGens[1];
-        this.noiseGen3 = (NoiseGeneratorOctaves)noiseGens[2];
-        this.noiseGen4 = (NoiseGeneratorOctaves)noiseGens[3];
-        this.noiseGen5 = (NoiseGeneratorOctaves)noiseGens[4];
+        this.noiseGen1 = (NoiseGeneratorOctaves) noiseGens[0];
+        this.noiseGen2 = (NoiseGeneratorOctaves) noiseGens[1];
+        this.noiseGen3 = (NoiseGeneratorOctaves) noiseGens[2];
+        this.noiseGen4 = (NoiseGeneratorOctaves) noiseGens[3];
+        this.noiseGen5 = (NoiseGeneratorOctaves) noiseGens[4];
     }
 
-    public void generateTerrain(int par1, int par2, Block[] par3, BiomeGenBase[] par4ArrayOfBiomeGenBase) {
-        byte var5 = 2;
-        int var6 = var5 + 1;
-        byte var7 = 33;
-        int var8 = var5 + 1;
-        this.densities = initializeNoiseField(this.densities, par1 * var5, 0, par2 * var5, var6, var7, var8);
-        for (int var9 = 0; var9 < var5; var9++) {
-            for (int var10 = 0; var10 < var5; var10++) {
-                for (int var11 = 0; var11 < 32; var11++) {
-                    double var12 = 0.25D;
-                    double var14 = this.densities[((var9 + 0) * var8 + var10 + 0) * var7 + var11 + 0];
-                    double var16 = this.densities[((var9 + 0) * var8 + var10 + 1) * var7 + var11 + 0];
-                    double var18 = this.densities[((var9 + 1) * var8 + var10 + 0) * var7 + var11 + 0];
-                    double var20 = this.densities[((var9 + 1) * var8 + var10 + 1) * var7 + var11 + 0];
-                    double var22 = (this.densities[((var9 + 0) * var8 + var10 + 0) * var7 + var11 + 1] - var14) * var12;
-                    double var24 = (this.densities[((var9 + 0) * var8 + var10 + 1) * var7 + var11 + 1] - var16) * var12;
-                    double var26 = (this.densities[((var9 + 1) * var8 + var10 + 0) * var7 + var11 + 1] - var18) * var12;
-                    double var28 = (this.densities[((var9 + 1) * var8 + var10 + 1) * var7 + var11 + 1] - var20) * var12;
-                    for (int var30 = 0; var30 < 4; var30++) {
-                        double var31 = 0.125D;
-                        double var33 = var14;
-                        double var35 = var16;
-                        double var37 = (var18 - var14) * var31;
-                        double var39 = (var20 - var16) * var31;
-                        for (int var41 = 0; var41 < 8; var41++) {
-                            int var42 = var41 + var9 * 8 << 11 | 0 + var10 * 8 << 7 | var11 * 4 + var30;
-                            short var43 = 128;
-                            double var44 = 0.125D;
-                            double var46 = var33;
-                            double var48 = (var35 - var33) * var44;
-                            for (int var50 = 0; var50 < 8; var50++) {
-                                Block var51=Blocks.air;
-                                if (var46 > 0.0D)
-                                    var51 = BOPTBlocks.holyStone;
-                                par3[var42] = var51;
-                                var42 += var43;
-                                var46 += var48;
+    public void generateTerrain(int x, int z, Block[] blocks, BiomeGenBase[] biomes) {
+        byte b0 = 2;
+        int k = b0 + 1;
+        byte b1 = 33;
+        int l = b0 + 1;
+        this.densities = this.initializeNoiseField(this.densities, x * b0, 0, z * b0, k, b1, l);
+
+        for (int i1 = 0; i1 < b0; ++i1) {
+            for (int j1 = 0; j1 < b0; ++j1) {
+                for (int k1 = 0; k1 < 32; ++k1) {
+                    double d0 = 0.25D;
+                    double d1 = this.densities[((i1 + 0) * l + j1 + 0) * b1 + k1 + 0];
+                    double d2 = this.densities[((i1 + 0) * l + j1 + 1) * b1 + k1 + 0];
+                    double d3 = this.densities[((i1 + 1) * l + j1 + 0) * b1 + k1 + 0];
+                    double d4 = this.densities[((i1 + 1) * l + j1 + 1) * b1 + k1 + 0];
+                    double d5 = (this.densities[((i1 + 0) * l + j1 + 0) * b1 + k1 + 1] - d1) * d0;
+                    double d6 = (this.densities[((i1 + 0) * l + j1 + 1) * b1 + k1 + 1] - d2) * d0;
+                    double d7 = (this.densities[((i1 + 1) * l + j1 + 0) * b1 + k1 + 1] - d3) * d0;
+                    double d8 = (this.densities[((i1 + 1) * l + j1 + 1) * b1 + k1 + 1] - d4) * d0;
+
+                    for (int l1 = 0; l1 < 4; ++l1) {
+                        double d9 = 0.125D;
+                        double d10 = d1;
+                        double d11 = d2;
+                        double d12 = (d3 - d1) * d9;
+                        double d13 = (d4 - d2) * d9;
+
+                        for (int i2 = 0; i2 < 8; ++i2) {
+                            int j2 = i2 + i1 * 8 << 11 | 0 + j1 * 8 << 7 | k1 * 4 + l1;
+                            short short1 = 128;
+                            double d14 = 0.125D;
+                            double d15 = d10;
+                            double d16 = (d11 - d10) * d14;
+
+                            for (int k2 = 0; k2 < 8; ++k2) {
+                                Block block = null;
+
+                                if (d15 > 0.0D) {
+                                    block = BOPTBlocks.holyStone;
+                                }
+
+                                blocks[j2] = block;
+                                j2 += short1;
+                                d15 += d16;
                             }
-                            var33 += var37;
-                            var35 += var39;
+
+                            d10 += d12;
+                            d11 += d13;
                         }
-                        var14 += var22;
-                        var16 += var24;
-                        var18 += var26;
-                        var20 += var28;
+
+                        d1 += d5;
+                        d2 += d6;
+                        d3 += d7;
+                        d4 += d8;
                     }
                 }
             }
@@ -116,7 +124,7 @@ public class ChunkProviderPromised implements IChunkProvider {
     public void replaceBlocksForBiome(int par1, int par2, Block[] par3, BiomeGenBase[] par4ArrayOfBiomeGenBase) {
         byte var98 = 63;
         ChunkProviderEvent.ReplaceBiomeBlocks event = new ChunkProviderEvent.ReplaceBiomeBlocks(this, par1, par2, par3, par4ArrayOfBiomeGenBase);
-        MinecraftForge.EVENT_BUS.post((Event)event);
+        MinecraftForge.EVENT_BUS.post((Event) event);
         if (event.getResult() == Event.Result.DENY)
             return;
         for (int var5 = 0; var5 < 16; var5++) {
@@ -171,7 +179,7 @@ public class ChunkProviderPromised implements IChunkProvider {
         Chunk var4 = new Chunk(this.endWorld, var3, par1, par2);
         byte[] var5 = var4.getBiomeArray();
         for (int var6 = 0; var6 < var5.length; var6++)
-            var5[var6] = (byte)(this.biomesForGeneration[var6]).biomeID;
+            var5[var6] = (byte) (this.biomesForGeneration[var6]).biomeID;
         var4.generateSkylightMap();
         return var4;
     }
@@ -180,12 +188,8 @@ public class ChunkProviderPromised implements IChunkProvider {
         ChunkProviderEvent.InitNoiseField event = new ChunkProviderEvent.InitNoiseField(this, ad, i, j, k, l, i1, j1);
         MinecraftForge.EVENT_BUS.post(event);
         if (event.getResult() == Event.Result.DENY) return event.noisefield;
-
         if (ad == null)
-        {
             ad = new double[l * i1 * j1];
-        }
-
         double d0 = 684.412D;
         double d1 = 684.412D;
         this.noiseData4 = this.noiseGen4.generateNoiseOctaves(this.noiseData4, i, k, l, j1, 1.121D, 1.121D, 0.5D);
@@ -197,120 +201,68 @@ public class ChunkProviderPromised implements IChunkProvider {
         int k1 = 0;
         int l1 = 0;
 
-        for (int i2 = 0; i2 < l; ++i2)
-        {
-            for (int j2 = 0; j2 < j1; ++j2)
-            {
+        for (int i2 = 0; i2 < l; ++i2) {
+            for (int j2 = 0; j2 < j1; ++j2) {
                 double d2 = (this.noiseData4[l1] + 256.0D) / 512.0D;
-
                 if (d2 > 1.0D)
-                {
                     d2 = 1.0D;
-                }
-
                 double d3 = this.noiseData5[l1] / 8000.0D;
-
                 if (d3 < 0.0D)
-                {
                     d3 = -d3 * 0.3D;
-                }
-
                 d3 = d3 * 3.0D - 2.0D;
-                float f = (float)(i2 + i - 0) / 1.0F;
-                float f1 = (float)(j2 + k - 0) / 1.0F;
+                float f = (float) (i2 + i - 0) / 1.0F;
+                float f1 = (float) (j2 + k - 0) / 1.0F;
                 float f2 = 100.0F - MathHelper.sqrt_float(f * f + f1 * f1) * 8.0F;
-
                 if (f2 > 80.0F)
-                {
                     f2 = 80.0F;
-                }
-
                 if (f2 < -100.0F)
-                {
                     f2 = -100.0F;
-                }
-
                 if (d3 > 1.0D)
-                {
                     d3 = 1.0D;
-                }
-
                 d3 /= 8.0D;
                 d3 = 0.0D;
-
                 if (d2 < 0.0D)
-                {
                     d2 = 0.0D;
-                }
-
                 d2 += 0.5D;
-                d3 = d3 * (double)i1 / 16.0D;
+                d3 = d3 * (double) i1 / 16.0D;
                 ++l1;
-                double d4 = (double)i1 / 2.0D;
-
-                for (int k2 = 0; k2 < i1; ++k2)
-                {
+                double d4 = (double) i1 / 2.0D;
+                for (int k2 = 0; k2 < i1; ++k2) {
                     double d5 = 0.0D;
-                    double d6 = ((double)k2 - d4) * 8.0D / d2;
-
+                    double d6 = ((double) k2 - d4) * 8.0D / d2;
                     if (d6 < 0.0D)
-                    {
                         d6 *= -1.0D;
-                    }
-
                     double d7 = this.noiseData2[k1] / 512.0D;
                     double d8 = this.noiseData3[k1] / 512.0D;
                     double d9 = (this.noiseData1[k1] / 10.0D + 1.0D) / 2.0D;
-
                     if (d9 < 0.0D)
-                    {
                         d5 = d7;
-                    }
-                    else if (d9 > 1.0D)
-                    {
+                     else if (d9 > 1.0D)
                         d5 = d8;
-                    }
-                    else
-                    {
+                     else
                         d5 = d7 + (d8 - d7) * d9;
-                    }
-
                     d5 -= 8.0D;
-                    d5 += (double)f2;
+                    d5 += (double) f2;
                     byte b0 = 2;
                     double d10;
-
-                    if (k2 > i1 / 2 - b0)
-                    {
-                        d10 = (double)((float)(k2 - (i1 / 2 - b0)) / 64.0F);
-
+                    if (k2 > i1 / 2 - b0) {
+                        d10 = (float) (k2 - (i1 / 2 - b0)) / 64.0F;
                         if (d10 < 0.0D)
-                        {
                             d10 = 0.0D;
-                        }
-
                         if (d10 > 1.0D)
-                        {
                             d10 = 1.0D;
-                        }
-
                         d5 = d5 * (1.0D - d10) + -3000.0D * d10;
                     }
-
                     b0 = 8;
-
-                    if (k2 < b0)
-                    {
-                        d10 = (double)((float)(b0 - k2) / ((float)b0 - 1.0F));
+                    if (k2 < b0) {
+                        d10 = (double) ((float) (b0 - k2) / ((float) b0 - 1.0F));
                         d5 = d5 * (1.0D - d10) + -30.0D * d10;
                     }
-
                     ad[k1] = d5;
                     ++k1;
                 }
             }
         }
-
         return ad;
     }
 
@@ -320,7 +272,7 @@ public class ChunkProviderPromised implements IChunkProvider {
 
     public void populate(IChunkProvider par1IChunkProvider, int par2, int par3) {
         BlockSand.fallInstantly = true;
-        MinecraftForge.EVENT_BUS.post((Event)new PopulateChunkEvent.Pre(par1IChunkProvider, this.endWorld, this.endWorld.rand, par2, par3, false));
+        MinecraftForge.EVENT_BUS.post((Event) new PopulateChunkEvent.Pre(par1IChunkProvider, this.endWorld, this.endWorld.rand, par2, par3, false));
         int var4 = par2 * 16;
         int var5 = par3 * 16;
         BiomeGenBase var6 = this.endWorld.getBiomeGenForCoords(var4 + 16, var5 + 16);
@@ -333,7 +285,7 @@ public class ChunkProviderPromised implements IChunkProvider {
                 this.endWorld.setBlock(x, y, z, BOPCBlocks.gemOre, 0, 2);
         }
         var6.decorate(this.endWorld, this.endWorld.rand, var4, var5);
-        MinecraftForge.EVENT_BUS.post((Event)new PopulateChunkEvent.Post(par1IChunkProvider, this.endWorld, this.endWorld.rand, par2, par3, false));
+        MinecraftForge.EVENT_BUS.post((Event) new PopulateChunkEvent.Post(par1IChunkProvider, this.endWorld, this.endWorld.rand, par2, par3, false));
         BlockSand.fallInstantly = false;
     }
 
@@ -344,6 +296,7 @@ public class ChunkProviderPromised implements IChunkProvider {
     public boolean unloadQueuedChunks() {
         return false;
     }
+
     public boolean canSave() {
         return true;
     }
@@ -365,7 +318,9 @@ public class ChunkProviderPromised implements IChunkProvider {
         return 0;
     }
 
-    public void recreateStructures(int par1, int par2) {}
+    public void recreateStructures(int par1, int par2) {
+    }
 
-    public void saveExtraData() {}
+    public void saveExtraData() {
+    }
 }
