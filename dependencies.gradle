@@ -35,5 +35,6 @@
  */
 dependencies {
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.5.4-GTNH:dev")
+    implementation "maven.modrinth:mysteriumlibunofficial:1.5.4"
     implementation "curse.maven:biomes-o-plenty-220318:2499612"
 }
