@@ -23,29 +23,29 @@ import java.util.Random;
 
 public class ChunkProviderPromised implements IChunkProvider {
     private final Random endRNG;
-    private final NoiseOctaves field_912_k;
-    private final NoiseOctaves field_911_l;
-    private final NoiseOctaves field_910_m;
-    public NoiseOctaves field_922_a;
-    public NoiseOctaves field_921_b;
+    private final NoiseOctaves noiseGen1;
+    private final NoiseOctaves noiseGen2;
+    private final NoiseOctaves noiseGen3;
+    public NoiseOctaves noiseGen4;
+    public NoiseOctaves noiseGen5;
     private final World endWorld;
     private double[] densities;
 
     private BiomeGenBase[] biomesForGeneration;
-    double[] field_4185_d;
-    double[] field_4184_e;
-    double[] field_4183_f;
-    double[] field_4182_g;
-    double[] field_4181_h;
+    double[] noiseData1;
+    double[] noiseData2;
+    double[] noiseData3;
+    double[] noiseData4;
+    double[] noiseData5;
 
     public ChunkProviderPromised(World world, long seed) {
         endWorld = world;
         endRNG = new Random(seed);
-        field_912_k = new NoiseOctaves(endRNG, 16);
-        field_911_l = new NoiseOctaves(endRNG, 16);
-        field_910_m = new NoiseOctaves(endRNG, 8);
-        field_922_a = new NoiseOctaves(endRNG, 10);
-        field_921_b = new NoiseOctaves(endRNG, 16);
+        noiseGen1 = new NoiseOctaves(endRNG, 16);
+        noiseGen2 = new NoiseOctaves(endRNG, 16);
+        noiseGen3 = new NoiseOctaves(endRNG, 8);
+        noiseGen4 = new NoiseOctaves(endRNG, 10);
+        noiseGen5 = new NoiseOctaves(endRNG, 16);
 
         //NoiseGeneratorOctaves[] noiseGens = {noiseGen1, noiseGen2, noiseGen3, noiseGen4, noiseGen5};
         //noiseGens = TerrainGen.getModdedNoiseGenerators(world, this.endRNG, noiseGens);
@@ -142,10 +142,7 @@ public class ChunkProviderPromised implements IChunkProvider {
                         var8 = -1;
                     } else if (var13 == BOPTBlocks.holyStone) {
                         if (var8 == -1) {
-                            if (var7 <= 0) {
-                                var9 = Blocks.air;
-                                var10 = BOPTBlocks.holyStone;
-                            } else if (var11 >= var98 - 4 && var11 <= var98 + 1) {
+                            if (var11 >= var98 - 4 && var11 <= var98 + 1) {
                                 var9 = var99.topBlock;
                                 var10 = var99.fillerBlock;
                             }
@@ -156,11 +153,7 @@ public class ChunkProviderPromised implements IChunkProvider {
 
                             var8 = var7;
 
-                            if (var11 >= 0) {
-                                par3ArrayOfByte[var12] = var9;
-                            } else {
-                                par3ArrayOfByte[var12] = var10;
-                            }
+                            par3ArrayOfByte[var12] = var9;
                         } else if (var8 > 0) {
                             --var8;
                             par3ArrayOfByte[var12] = var10;
@@ -210,14 +203,14 @@ public class ChunkProviderPromised implements IChunkProvider {
         if (ad == null) {
             ad = new double[l * i1 * j1];
         }
-        double d = 684.41200000000003D;
-        double d1 = 684.41200000000003D;
-        field_4182_g = field_922_a.generateNoiseOctaves(field_4182_g, i, k, l, j1, 1.121D, 1.121D, 0.5D);
-        field_4181_h = field_921_b.generateNoiseOctaves(field_4181_h, i, k, l, j1, 200D, 200D, 0.5D);
+        double d = 684.412;
+        double d1 = 684.412;
+        noiseData4 = noiseGen4.generateNoiseOctaves(noiseData4, i, k, l, j1, 1.121D, 1.121D, 0.5D);
+        noiseData5 = noiseGen5.generateNoiseOctaves(noiseData5, i, k, l, j1, 200D, 200D, 0.5D);
         d *= 2D;
-        field_4185_d = field_910_m.generateNoiseOctaves(field_4185_d, i, j, k, l, i1, j1, d / 80D, d1 / 160D, d / 80D);
-        field_4184_e = field_912_k.generateNoiseOctaves(field_4184_e, i, j, k, l, i1, j1, d, d1, d);
-        field_4183_f = field_911_l.generateNoiseOctaves(field_4183_f, i, j, k, l, i1, j1, d, d1, d);
+        noiseData1 = noiseGen3.generateNoiseOctaves(noiseData1, i, j, k, l, i1, j1, d / 80D, d1 / 160D, d / 80D);
+        noiseData2 = noiseGen1.generateNoiseOctaves(noiseData2, i, j, k, l, i1, j1, d, d1, d);
+        noiseData3 = noiseGen2.generateNoiseOctaves(noiseData3, i, j, k, l, i1, j1, d, d1, d);
         int k1 = 0;
         int l1 = 0;
         int i2 = 16 / l;
@@ -231,14 +224,14 @@ public class ChunkProviderPromised implements IChunkProvider {
                 d4 *= d4;
                 d4 *= d4;
                 d4 = 1.0D - d4;
-                double d5 = (field_4182_g[l1] + 256D) / 512D;
+                double d5 = (noiseData4[l1] + 256D) / 512D;
                 d5 *= d4;
                 if (d5 > 1.0D) {
                     d5 = 1.0D;
                 }
-                double d6 = field_4181_h[l1] / 8000D;
+                double d6 = noiseData5[l1] / 8000D;
                 if (d6 < 0.0D) {
-                    d6 = -d6 * 0.29999999999999999D;
+                    d6 = -d6 * 0.3;
                 }
                 d6 = d6 * 3D - 2D;
                 if (d6 > 1.0D) {
@@ -259,9 +252,9 @@ public class ChunkProviderPromised implements IChunkProvider {
                     if (d9 < 0.0D) {
                         d9 *= -1D;
                     }
-                    double d10 = field_4184_e[k1] / 512D;
-                    double d11 = field_4183_f[k1] / 512D;
-                    double d12 = (field_4185_d[k1] / 10D + 1.0D) / 2D;
+                    double d10 = noiseData2[k1] / 512D;
+                    double d11 = noiseData3[k1] / 512D;
+                    double d12 = (noiseData1[k1] / 10D + 1.0D) / 2D;
                     if (d12 < 0.0D) {
                         d8 = d10;
                     } else if (d12 > 1.0D) {
@@ -487,10 +480,6 @@ public class ChunkProviderPromised implements IChunkProvider {
 
     @Override
     public boolean unloadQueuedChunks() {
-        return false;
-    }
-
-    public boolean unload100OldestChunks() {
         return false;
     }
 
